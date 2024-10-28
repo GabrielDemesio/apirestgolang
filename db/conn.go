@@ -1,31 +1,27 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq" // Importação anônima do driver PostgreSQL
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
 )
 
 const (
-	host     = "localhost" // Corrigido para "localhost"
+	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "1234" // Adicione a senha do usuário
+	password = "1234" // Coloque sua senha aqui
 	dbname   = "postgres"
 )
 
-func Connect() (*sql.DB, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+func Connect() (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("erro ao abrir a conexão com o banco de dados: %w", err)
+		log.Fatalf("erro ao conectar ao banco de dados: %v", err)
+		return nil, err // Retorna nil e o erro
 	}
-	err = db.Ping()
-	if err != nil {
-		return nil, fmt.Errorf("erro ao verificar a conexão com o banco de dados: %w", err)
-	}
-	fmt.Println("Conexão com o banco de dados", dbname, "foi estabelecida com sucesso.")
-	return db, nil
+	return db, nil // Retorna a conexão e nil
 }
