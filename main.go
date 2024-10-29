@@ -24,6 +24,8 @@ func main() {
 	router := gin.Default()
 	router.GET("/product", productController.GetProducts)
 	router.POST("/product", productController.SaveProduct)
+	router.GET("/product/:id", productController.GetProductById)
+	router.DELETE("/product/:id", productController.DeleteProduct)
 
 	// Iniciar o servidor
 	router.Run(":8000")
