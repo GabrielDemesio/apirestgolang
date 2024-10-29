@@ -9,24 +9,21 @@ import (
 )
 
 func main() {
-	// Conectar ao banco de dados
 	dbConnection, err := db.Connect()
 	if err != nil {
 		panic(err) // Trate o erro de forma apropriada em um código de produção
 	}
 
-	// Inicializar o repositório, caso de uso e controlador
 	productRepo := repository.NewProductRepository(dbConnection)
 	productUseCase := useCase.NewProductUseCase(productRepo)
 	productController := controller.NewProductController(productUseCase)
 
-	// Configurar o roteador Gin
 	router := gin.Default()
 	router.GET("/product", productController.GetProducts)
 	router.POST("/product", productController.SaveProduct)
 	router.GET("/product/:id", productController.GetProductById)
 	router.DELETE("/product/:id", productController.DeleteProduct)
+	router.PUT("/product/:id", productController.EditProduct)
 
-	// Iniciar o servidor
 	router.Run(":8000")
 }

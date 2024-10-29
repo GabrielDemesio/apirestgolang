@@ -11,7 +11,7 @@ const (
 	host     = "localhost"
 	port     = 5432
 	user     = "postgres"
-	password = "1234" // Coloque sua senha aqui
+	password = "1234"
 	dbname   = "postgres"
 )
 
@@ -21,7 +21,7 @@ func Connect() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("erro ao conectar ao banco de dados: %v", err)
-		return nil, err // Retorna nil e o erro
+		return nil, err
 	}
-	return db, nil // Retorna a conexão e nil
+	return db, nil
 }

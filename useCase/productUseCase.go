@@ -12,6 +12,7 @@ type ProductUseCase interface {
 	SaveProduct(product model.Product) (model.Product, error)
 	GetProductById(id int) (model.Product, error)
 	DeleteProduct(id int) error
+	EditProduct(product model.Product) (model.Product, error)
 }
 
 type ProductUseCaseImpl struct {
@@ -33,7 +34,6 @@ func (uc *ProductUseCaseImpl) SaveProduct(product model.Product) (model.Product,
 	}
 	return product, nil
 }
-
 func (uc *ProductUseCaseImpl) GetProductById(id int) (model.Product, error) {
 	if id == 0 {
 		return model.Product{}, errors.New("Product ID is required")
@@ -47,13 +47,10 @@ func (uc *ProductUseCaseImpl) GetProductById(id int) (model.Product, error) {
 	}
 	return product, nil
 }
-
 func (uc *ProductUseCaseImpl) DeleteProduct(id int) error {
 	if id == 0 {
 		return errors.New("Product ID is required")
 	}
-
-	// Chama o método DeleteProduct do repositório passando apenas o ID
 	if err := uc.repo.DeleteProduct(id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("Product not found")
@@ -61,4 +58,21 @@ func (uc *ProductUseCaseImpl) DeleteProduct(id int) error {
 		return err
 	}
 	return nil
+}
+func (uc *ProductUseCaseImpl) EditProduct(product model.Product) (model.Product, error) {
+	if product.ID == 0 {
+		return model.Product{}, errors.New("ID do produto é obrigatório")
+	}
+	_, err := uc.repo.GetProductById(product.ID) // Passando ID como int
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Product{}, errors.New("Produto não encontrado")
+		}
+		return model.Product{}, err
+	}
+	if err := uc.repo.EditProduct(product); err != nil {
+		return model.Product{}, err
+	}
+
+	return product, nil
 }
