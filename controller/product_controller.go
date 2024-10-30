@@ -24,7 +24,7 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Erro ao buscar produtos",
+			"error":   "Error to find product",
 			"message": err.Error(),
 		})
 		return
@@ -37,21 +37,21 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 func (p *ProductController) GetProductById(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto é obrigatório"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is required"})
 		return
 	}
 	productID, err := strconv.Atoi(productIDStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto deve ser um número válido"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is invalid"})
 		return
 	}
 	product, err := p.productUseCase.GetProductById(productID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Produto não encontrado"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar o produto"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error to find the product"})
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -70,7 +70,7 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 	createdProduct, err := p.productUseCase.SaveProduct(product)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Erro ao criar produto",
+			"error":   "Error to create product",
 			"message": err.Error(),
 		})
 		return
@@ -84,41 +84,42 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 func (p *ProductController) DeleteProduct(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto é obrigatório"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is required"})
 		return
 	}
 	productID, err := strconv.Atoi(productIDStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto deve ser um número válido"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is invalid"})
 		return
 	}
 	err = p.productUseCase.DeleteProduct(productID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Produto não encontrado"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao excluir o produto"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error to delete product"})
 		return
 	}
 	ctx.Status(http.StatusNoContent)
 }
+
 func (p *ProductController) EditProduct(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto é obrigatório"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is required"})
 		return
 	}
 
 	productID, err := strconv.Atoi(productIDStr)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID do produto deve ser um número válido"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product id is invalid"})
 		return
 	}
 
 	var product model.Product
 	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos para o produto"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product is required"})
 		return
 	}
 
@@ -126,13 +127,13 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 
 	updatedProduct, err := p.productUseCase.EditProduct(product)
 	if err != nil {
-		if err.Error() == "Produto não encontrado" {
-			ctx.JSON(http.StatusNotFound, gin.H{"error": "Produto não encontrado"})
+		if err.Error() == "Product not found" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar o produto"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error to update the product"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Produto atualizado com sucesso", "data": updatedProduct})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated with success", "data": updatedProduct})
 }

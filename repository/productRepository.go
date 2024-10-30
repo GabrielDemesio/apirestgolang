@@ -35,7 +35,7 @@ func (pr *ProductRepositoryImpl) GetProducts() ([]model.Product, error) {
 func (pr *ProductRepositoryImpl) GetProductById(productID int) (model.Product, error) {
 	var product model.Product
 	if err := pr.connection.Table("product").First(&product, "id = ?", productID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Printf("Erro ao buscar produto: %v", err)
 			return model.Product{}, err
 		}

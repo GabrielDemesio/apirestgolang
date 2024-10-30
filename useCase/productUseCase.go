@@ -36,12 +36,12 @@ func (uc *ProductUseCaseImpl) SaveProduct(product model.Product) (model.Product,
 }
 func (uc *ProductUseCaseImpl) GetProductById(id int) (model.Product, error) {
 	if id == 0 {
-		return model.Product{}, errors.New("Product ID is required")
+		return model.Product{}, errors.New("product ID is required")
 	}
 	product, err := uc.repo.GetProductById(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Product{}, errors.New("Product not found")
+			return model.Product{}, errors.New("product not found")
 		}
 		return model.Product{}, err
 	}
@@ -49,11 +49,11 @@ func (uc *ProductUseCaseImpl) GetProductById(id int) (model.Product, error) {
 }
 func (uc *ProductUseCaseImpl) DeleteProduct(id int) error {
 	if id == 0 {
-		return errors.New("Product ID is required")
+		return errors.New("product ID is required")
 	}
 	if err := uc.repo.DeleteProduct(id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("Product not found")
+			return errors.New("product not found")
 		}
 		return err
 	}
@@ -61,12 +61,12 @@ func (uc *ProductUseCaseImpl) DeleteProduct(id int) error {
 }
 func (uc *ProductUseCaseImpl) EditProduct(product model.Product) (model.Product, error) {
 	if product.ID == 0 {
-		return model.Product{}, errors.New("ID do produto é obrigatório")
+		return model.Product{}, errors.New("product id is required")
 	}
-	_, err := uc.repo.GetProductById(product.ID) // Passando ID como int
+	_, err := uc.repo.GetProductById(product.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Product{}, errors.New("Produto não encontrado")
+			return model.Product{}, errors.New("product not found")
 		}
 		return model.Product{}, err
 	}
