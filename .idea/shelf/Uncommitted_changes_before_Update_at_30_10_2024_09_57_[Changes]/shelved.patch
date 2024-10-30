@@ -1,0 +1,15 @@
+Index: apirestgolang/README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># apirestgolang
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/apirestgolang/README.md b/apirestgolang/README.md
+--- a/apirestgolang/README.md	(revision b869671fd0678117c1c7e098582293cc5fd30879)
++++ b/apirestgolang/README.md	(date 1730292984230)
+@@ -1,1 +1,2 @@
+-# apirestgolang
+\ No newline at end of file
++# api-rest-golang
++CRUD using GORM

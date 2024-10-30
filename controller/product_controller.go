@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"apirestgo/model"
+	"apirestgo/useCase"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"go-api-rest/apirestgolang/model"
-	"go-api-rest/apirestgolang/useCase"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"

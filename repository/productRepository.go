@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"apirestgo/model"
 	"errors"
-	"go-api-rest/apirestgolang/model"
 	"gorm.io/gorm"
 	"log"
 )

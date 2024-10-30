@@ -1,11 +1,11 @@
 package main
 
 import (
+	"apirestgo/controller"
+	"apirestgo/db"
+	"apirestgo/repository"
+	"apirestgo/useCase"
 	"github.com/gin-gonic/gin"
-	"go-api-rest/apirestgolang/controller"
-	"go-api-rest/apirestgolang/db"
-	"go-api-rest/apirestgolang/repository"
-	"go-api-rest/apirestgolang/useCase"
 )
 
 func main() {

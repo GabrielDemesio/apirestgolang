@@ -1,0 +1,5 @@
+# Ignorar diretórios e arquivos que não são necessários no contêiner
+.git
+bin/
+vendor/
+*.log

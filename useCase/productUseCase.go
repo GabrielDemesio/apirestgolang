@@ -1,9 +1,9 @@
 package useCase
 
 import (
+	"apirestgo/model"
+	"apirestgo/repository"
 	"errors"
-	"go-api-rest/apirestgolang/model"
-	"go-api-rest/apirestgolang/repository"
 	"gorm.io/gorm"
 )
 
