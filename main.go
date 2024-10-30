@@ -11,7 +11,7 @@ import (
 func main() {
 	dbConnection, err := db.Connect()
 	if err != nil {
-		panic(err) // Trate o erro de forma apropriada em um código de produção
+		panic(err)
 	}
 
 	productRepo := repository.NewProductRepository(dbConnection)
@@ -25,5 +25,8 @@ func main() {
 	router.DELETE("/product/:id", productController.DeleteProduct)
 	router.PUT("/product/:id", productController.EditProduct)
 
-	router.Run(":8000")
+	err = router.Run(":8000")
+	if err != nil {
+		return
+	}
 }

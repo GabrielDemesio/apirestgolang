@@ -26,7 +26,7 @@ func (pr *ProductRepositoryImpl) GetProducts() ([]model.Product, error) {
 	var productList []model.Product
 
 	if err := pr.connection.Table("product").Find(&productList).Error; err != nil {
-		log.Printf("Erro ao buscar produtos: %v", err)
+		log.Printf("Error to find product: %v", err)
 		return nil, err
 	}
 
@@ -36,24 +36,24 @@ func (pr *ProductRepositoryImpl) GetProductById(productID int) (model.Product, e
 	var product model.Product
 	if err := pr.connection.Table("product").First(&product, "id = ?", productID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("Erro ao buscar produto: %v", err)
+			log.Printf("Error to find product: %v", err)
 			return model.Product{}, err
 		}
-		log.Printf("Erro ao buscar produto: %v", err)
+		log.Printf("Error to find product: %v", err)
 		return model.Product{}, err
 	}
 	return product, nil
 }
 func (pr *ProductRepositoryImpl) SaveProduct(product model.Product) error {
 	if err := pr.connection.Table("product").Create(&product).Error; err != nil {
-		log.Printf("Erro ao buscar produtos: %v", err)
+		log.Printf("Error to find product: %v", err)
 		return err
 	}
 	return nil
 }
 func (pr *ProductRepositoryImpl) DeleteProduct(productID int) error {
 	if err := pr.connection.Table("product").Where("id = ?", productID).Delete(&model.Product{}).Error; err != nil {
-		log.Printf("Erro ao deletar produto com ID %d: %v", productID, err)
+		log.Printf("Error to delete ID %d: %v", productID, err)
 		return err
 	}
 	return nil
@@ -62,14 +62,14 @@ func (pr *ProductRepositoryImpl) EditProduct(product model.Product) error {
 	var existingProduct model.Product
 	if err := pr.connection.Table("product").First(&existingProduct, product.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("Produto não encontrado: ID %d", product.ID)
+			log.Printf("Product not found: ID %d", product.ID)
 			return gorm.ErrRecordNotFound
 		}
-		log.Printf("Erro ao buscar produto: %v", err)
+		log.Printf("Error to found product: %v", err)
 		return err
 	}
 	if err := pr.connection.Table("product").Save(&product).Error; err != nil {
-		log.Printf("Erro ao editar produto: %v", err)
+		log.Printf("Error to update product: %v", err)
 		return err
 	}
 
