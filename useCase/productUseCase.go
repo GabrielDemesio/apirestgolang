@@ -4,6 +4,7 @@ import (
 	"apirestgo/model"
 	"apirestgo/repository"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +14,7 @@ type ProductUseCase interface {
 	GetProductById(id int) (model.Product, error)
 	DeleteProduct(id int) error
 	EditProduct(product model.Product) (model.Product, error)
+	GetProductByName(name string) (model.Product, error)
 }
 
 type ProductUseCaseImpl struct {
@@ -71,6 +73,21 @@ func (uc *ProductUseCaseImpl) EditProduct(product model.Product) (model.Product,
 		return model.Product{}, err
 	}
 	if err := uc.repo.EditProduct(product); err != nil {
+		return model.Product{}, err
+	}
+
+	return product, nil
+}
+func (uc *ProductUseCaseImpl) GetProductByName(productname string) (model.Product, error) {
+	if productname == "" {
+		return model.Product{}, errors.New("product name is required")
+	}
+
+	product, err := uc.repo.GetByProductName(productname)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Product{}, fmt.Errorf("product not found: %s", productname)
+		}
 		return model.Product{}, err
 	}
 

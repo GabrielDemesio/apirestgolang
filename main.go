@@ -20,6 +20,7 @@ func main() {
 
 	router := gin.Default()
 	router.GET("/product", productController.GetProducts)
+	router.GET("/product/name/:name", productController.GetProductByName)
 	router.POST("/product", productController.SaveProduct)
 	router.GET("/product/:id", productController.GetProductById)
 	router.DELETE("/product/:id", productController.DeleteProduct)

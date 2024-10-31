@@ -3,6 +3,7 @@ package repository
 import (
 	"apirestgo/model"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"log"
 )
@@ -13,6 +14,7 @@ type ProductRepository interface {
 	DeleteProduct(productID int) error
 	GetProductById(productID int) (model.Product, error)
 	EditProduct(product model.Product) error
+	GetByProductName(productName string) (model.Product, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -74,4 +76,18 @@ func (pr *ProductRepositoryImpl) EditProduct(product model.Product) error {
 	}
 
 	return nil
+}
+func (pr *ProductRepositoryImpl) GetByProductName(productName string) (model.Product, error) {
+	if productName == "" {
+		return model.Product{}, errors.New("product name cannot be empty")
+	}
+
+	var product model.Product
+	if err := pr.connection.Table("product").Where("productname = ?", productName).First(&product).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.Product{}, fmt.Errorf("product not found: %s", productName)
+		}
+		return model.Product{}, err
+	}
+	return product, nil
 }

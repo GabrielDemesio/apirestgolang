@@ -4,6 +4,7 @@ import (
 	"apirestgo/model"
 	"apirestgo/useCase"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -136,4 +137,23 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated with success", "data": updatedProduct})
+}
+func (p *ProductController) GetProductByName(ctx *gin.Context) {
+	productName := ctx.Param("name")
+	if productName == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product name is required"})
+		return
+	}
+
+	product, err := p.productUseCase.GetProductByName(productName)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("product not found: %s", productName)})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": product})
 }
