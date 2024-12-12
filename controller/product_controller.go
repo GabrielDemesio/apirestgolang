@@ -21,6 +21,13 @@ func NewProductController(useCase useCase.ProductUseCase) *ProductController {
 	}
 }
 
+// @Summary Get all products
+// @Description Get the list of all products
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Product
+// @Router /product [get]
 func (p *ProductController) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
@@ -35,6 +42,13 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 	})
 }
 
+// @Summary Get product by id
+// @Description Get a specific product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Product
+// @Router /product/{id} [get]
 func (p *ProductController) GetProductById(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
@@ -60,11 +74,26 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 	})
 }
 
+// @Summary Create a new product
+// @Description Create a new product in the system (ID will be auto-generated and cannot be provided)
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param product body model.Product true "Product data (ID will be ignored)"
+// @Success 201 {object} model.Product
+// @Failure 400 {object} map[string]string "Bad Request"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /product [post]
 func (p *ProductController) SaveProduct(ctx *gin.Context) {
 	var product model.Product
 
 	if err := ctx.ShouldBindJSON(&product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if product.ID != 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID cannot be provided when creating a new product"})
 		return
 	}
 
@@ -82,6 +111,13 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 	})
 }
 
+// @Summary Delete a product
+// @Description Delete the product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Product
+// @Router /product/{id} [delete]
 func (p *ProductController) DeleteProduct(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
@@ -105,6 +141,18 @@ func (p *ProductController) DeleteProduct(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
+// @Summary Update an existing product
+// @Description Update an existing product by its ID (ID in body must match ID in URL)
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Param product body model.Product true "Updated product data (ID cannot be changed)"
+// @Success 200 {object} model.Product
+// @Failure 400 {object} map[string]string "Bad Request"
+// @Failure 404 {object} map[string]string "Not Found"
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /product/{id} [put]
 func (p *ProductController) EditProduct(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
 	if productIDStr == "" {
@@ -120,11 +168,17 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 
 	var product model.Product
 	if err := ctx.ShouldBindJSON(&product); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "product is required"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product data"})
 		return
 	}
 
-	product.ID = productID
+	// Garantir que o ID enviado no corpo não seja diferente do ID da URL
+	if product.ID != 0 && product.ID != productID {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID in body does not match ID in URL"})
+		return
+	}
+
+	product.ID = productID // Garantir que usamos o ID da URL
 
 	updatedProduct, err := p.productUseCase.EditProduct(product)
 	if err != nil {
@@ -138,6 +192,14 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Product updated with success", "data": updatedProduct})
 }
+
+// @Summary Get products by name
+// @Description Get the list of a specific product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} model.Product
+// @Router /product/name [get]
 func (p *ProductController) GetProductByName(ctx *gin.Context) {
 	productName := ctx.Param("name")
 	if productName == "" {
