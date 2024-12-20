@@ -172,13 +172,12 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 		return
 	}
 
-	// Garantir que o ID enviado no corpo não seja diferente do ID da URL
 	if product.ID != 0 && product.ID != productID {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID in body does not match ID in URL"})
 		return
 	}
 
-	product.ID = productID // Garantir que usamos o ID da URL
+	product.ID = productID
 
 	updatedProduct, err := p.productUseCase.EditProduct(product)
 	if err != nil {
