@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  controller.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   model.Product:
     properties:
       description:
@@ -73,16 +78,32 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete the product
+      description: Delete the product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
-            items:
-              $ref: '#/definitions/model.Product'
-            type: array
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
       summary: Delete a product
       tags:
       - products

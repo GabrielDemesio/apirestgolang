@@ -111,12 +111,20 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 	})
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 // @Summary Delete a product
-// @Description Delete the product
+// @Description Delete the product by ID
 // @Tags products
 // @Accept json
 // @Produce json
-// @Success 200 {array} model.Product
+// @Param id path int true "Product ID"
+// @Success 200 {string} string "Product Deleted"
+// @Failure 400 {object} ErrorResponse "Bad Request"
+// @Failure 404 {object} ErrorResponse "Not Found"
+// @Failure 500 {object} ErrorResponse "Internal Server Error"
 // @Router /product/{id} [delete]
 func (p *ProductController) DeleteProduct(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
