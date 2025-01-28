@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"apirestgo/dto"
+	"apirestgo/mapper"
 	"apirestgo/model"
 	"apirestgo/useCase"
 	"errors"
@@ -21,6 +23,10 @@ func NewProductController(useCase useCase.ProductUseCase) *ProductController {
 	}
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 // @Summary Get all products
 // @Description Get the list of all products
 // @Tags products
@@ -32,13 +38,19 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Error to find product",
+			"error":   "Error to find products",
 			"message": err.Error(),
 		})
 		return
 	}
+
+	var productDTOs []dto.ProductResponse
+	for _, product := range products {
+		productDTOs = append(productDTOs, mapper.ToProductResponse(product))
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": products,
+		"data": productDTOs,
 	})
 }
 
@@ -69,8 +81,11 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error to find the product"})
 		return
 	}
+
+	productDTO := mapper.ToProductResponse(product)
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": product,
+		"data": productDTO,
 	})
 }
 
@@ -79,22 +94,23 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 // @Tags products
 // @Accept json
 // @Produce json
-// @Param product body model.Product true "Product data (ID will be ignored)"
-// @Success 201 {object} model.Product
+// @Param product body dto.ProductRequest true "Product data (ID will be ignored)"
+// @Success 201 {object} dto.ProductResponse
 // @Failure 400 {object} map[string]string "Bad Request"
 // @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /product [post]
 func (p *ProductController) SaveProduct(ctx *gin.Context) {
-	var product model.Product
+	var productRequest dto.ProductRequest
 
-	if err := ctx.ShouldBindJSON(&product); err != nil {
+	if err := ctx.ShouldBindJSON(&productRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if product.ID != 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID cannot be provided when creating a new product"})
-		return
+	product := model.Product{
+		Name:        productRequest.Name,
+		Price:       productRequest.Price,
+		Description: productRequest.Description,
 	}
 
 	createdProduct, err := p.productUseCase.SaveProduct(product)
@@ -106,13 +122,16 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"data": createdProduct,
-	})
-}
+	productResponse := dto.ProductResponse{
+		ID:          createdProduct.ID,
+		Name:        createdProduct.Name,
+		Price:       createdProduct.Price,
+		Description: createdProduct.Description,
+	}
 
-type ErrorResponse struct {
-	Error string `json:"error"`
+	ctx.JSON(http.StatusCreated, gin.H{
+		"data": productResponse,
+	})
 }
 
 // @Summary Delete a product
@@ -180,12 +199,12 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 		return
 	}
 
-	if product.ID != 0 && product.ID != productID {
+	if product.ID != 0 && productID != int(product.ID) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID in body does not match ID in URL"})
 		return
 	}
 
-	product.ID = productID
+	product.ID = int(uint(productID))
 
 	updatedProduct, err := p.productUseCase.EditProduct(product)
 	if err != nil {
@@ -205,6 +224,7 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 // @Tags products
 // @Accept json
 // @Produce json
+// @Param name query string true "Product Name"
 // @Success 200 {array} model.Product
 // @Router /product/name [get]
 func (p *ProductController) GetProductByName(ctx *gin.Context) {

@@ -5,6 +5,30 @@ definitions:
       error:
         type: string
     type: object
+  dto.ProductRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    required:
+    - description
+    - name
+    - price
+    type: object
+  dto.ProductResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
   model.Product:
     properties:
       description:
@@ -51,14 +75,14 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/model.Product'
+          $ref: '#/definitions/dto.ProductRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Product'
+            $ref: '#/definitions/dto.ProductResponse'
         "400":
           description: Bad Request
           schema:
@@ -88,8 +112,8 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: Product Deleted
           schema:
             type: string
         "400":
@@ -173,6 +197,12 @@ paths:
       consumes:
       - application/json
       description: Get the list of a specific product
+      parameters:
+      - description: Product Name
+        in: query
+        name: name
+        required: true
+        type: string
       produces:
       - application/json
       responses:

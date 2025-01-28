@@ -65,7 +65,7 @@ func (uc *ProductUseCaseImpl) EditProduct(product model.Product) (model.Product,
 	if product.ID == 0 {
 		return model.Product{}, errors.New("product id is required")
 	}
-	_, err := uc.repo.GetProductById(product.ID)
+	_, err := uc.repo.GetProductById(int(product.ID))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.Product{}, errors.New("product not found")
@@ -78,15 +78,15 @@ func (uc *ProductUseCaseImpl) EditProduct(product model.Product) (model.Product,
 
 	return product, nil
 }
-func (uc *ProductUseCaseImpl) GetProductByName(productname string) (model.Product, error) {
-	if productname == "" {
+func (uc *ProductUseCaseImpl) GetProductByName(productName string) (model.Product, error) {
+	if productName == "" {
 		return model.Product{}, errors.New("product name is required")
 	}
 
-	product, err := uc.repo.GetByProductName(productname)
+	product, err := uc.repo.GetByProductName(productName)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return model.Product{}, fmt.Errorf("product not found: %s", productname)
+			return model.Product{}, fmt.Errorf("product not found: %s", productName)
 		}
 		return model.Product{}, err
 	}
