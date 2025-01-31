@@ -1,19 +1,43 @@
-FROM golang:1.22 AS builder
+FROM golang:1.22-alpine as build
 
-WORKDIR /api-go-rest
+ENV GOBIN /usr/local/go/bin
+ENV PATH /go/bin:$PATH
+ENV GO111MODULE on
+ENV GOPROXY direct
+ENV GOSUMDB off
 
-COPY go.mod go.sum ./
+RUN apk update && \
+   apk --no-cache upgrade && \
+   apk add --no-cache tzdata gcc musl-dev git make bash && \
+   cp /usr/share/zoneinfo/Brazil/East /etc/localtime && \
+   echo 'Brazil/East' > /etc/timezone && \
+   rm -rf /var/cache/apk/*
 
-RUN go mod download
+WORKDIR /app
 
 COPY . .
 
-RUN go build -o main .
+RUN rm -rf go.sum
 
-FROM alpine:latest
+RUN go clean --modcache
+RUN go mod tidy
+RUN go mod download
+RUN go mod verify
+RUN go mod vendor
 
-COPY --from=builder /api-go-rest/main .
+RUN GOOS=linux go build -a -buildvcs=false -installsuffix cgo -o main .
 
-EXPOSE 8000
+FROM alpine:3.17.0
 
-CMD ["./main"]
+RUN apk update && \
+   apk --no-cache upgrade && \
+   apk add --no-cache tzdata gcc musl-dev git make bash && \
+   cp /usr/share/zoneinfo/Brazil/East /etc/localtime && \
+   echo 'Brazil/East' > /etc/timezone && \
+   rm -rf /var/cache/apk/*
+
+WORKDIR /app
+COPY --from=build /app/main .
+
+
+ENTRYPOINT ["./main"]

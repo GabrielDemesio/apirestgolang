@@ -43,12 +43,10 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 		})
 		return
 	}
-
 	var productDTOs []dto.ProductResponse
 	for _, product := range products {
 		productDTOs = append(productDTOs, mapper.ToProductResponse(product))
 	}
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": productDTOs,
 	})
@@ -81,9 +79,7 @@ func (p *ProductController) GetProductById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error to find the product"})
 		return
 	}
-
 	productDTO := mapper.ToProductResponse(product)
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": productDTO,
 	})
@@ -106,13 +102,11 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	product := model.Product{
 		Name:        productRequest.Name,
 		Price:       productRequest.Price,
 		Description: productRequest.Description,
 	}
-
 	createdProduct, err := p.productUseCase.SaveProduct(product)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -121,7 +115,6 @@ func (p *ProductController) SaveProduct(ctx *gin.Context) {
 		})
 		return
 	}
-
 	productResponse := dto.ProductResponse{
 		ID:          createdProduct.ID,
 		Name:        createdProduct.Name,

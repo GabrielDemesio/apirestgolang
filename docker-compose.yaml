@@ -1,7 +1,12 @@
 version: "3.9"
 
+networks:
+    go_net:
+        driver: bridge
 services:
   go_db:
+    networks:
+        - go_net
     container_name: go_db
     image: postgres:17
     environment:
@@ -14,11 +19,13 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   go_app:
+    networks:
+        - go_net
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       - go_db
     environment:
