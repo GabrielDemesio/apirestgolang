@@ -34,7 +34,7 @@ RUN apk update && \
    apk add --no-cache tzdata gcc musl-dev git make bash && \
    cp /usr/share/zoneinfo/Brazil/East /etc/localtime && \
    echo 'Brazil/East' > /etc/timezone && \
-   rm -rf /var/cache/apk/*
+   rm -rf /var/cache/apk
 
 WORKDIR /app
 COPY --from=build /app/main .
