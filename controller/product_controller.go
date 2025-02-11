@@ -33,6 +33,7 @@ type ErrorResponse struct {
 // @Accept json
 // @Produce json
 // @Success 200 {array} model.Product
+// @Failure 500 {object} ErrorResponse "Internal Server Error"
 // @Router /product [get]
 func (p *ProductController) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
@@ -57,7 +58,11 @@ func (p *ProductController) GetProducts(ctx *gin.Context) {
 // @Tags products
 // @Accept json
 // @Produce json
+// @Param id path int true "Product ID"
 // @Success 200 {array} model.Product
+// @Failure 400 {object} ErrorResponse "Bad Request"
+// @Failure 404 {object} ErrorResponse "Not Found"
+// @Failure 500 {object} ErrorResponse "Internal Server Error"
 // @Router /product/{id} [get]
 func (p *ProductController) GetProductById(ctx *gin.Context) {
 	productIDStr := ctx.Param("id")
@@ -219,6 +224,9 @@ func (p *ProductController) EditProduct(ctx *gin.Context) {
 // @Produce json
 // @Param name query string true "Product Name"
 // @Success 200 {array} model.Product
+// @Failure 400 {object} ErrorResponse "Bad Request"
+// @Failure 404 {object} ErrorResponse "Not Found"
+// @Failure 500 {object} ErrorResponse "Internal Server Error"
 // @Router /product/name [get]
 func (p *ProductController) GetProductByName(ctx *gin.Context) {
 	productName := ctx.Param("name")
